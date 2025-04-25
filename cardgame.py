@@ -34,6 +34,10 @@ from __future__ import annotations #needed so classes could depend on eachother 
 import random
 from typing import List 
 
+#for graphics
+import tkinter as tk
+from tkinter import messagebox
+
 
 
 #Card Class
@@ -102,12 +106,18 @@ class Hand(Deck):
 
 class CardGame: 
     def __init__(self, name):
-        self.deck = Deck()
-        self.deck.shuffle()
         self.users = {
             name :  Hand(),
             "Computer" : Hand()
         }
+        #For Creative Element --> scoreboard graphic 
+        self.playerScore = 0
+        self.computerScore = 0
+        self.setupGame()
+
+    def setupGame(self):
+        self.deck = Deck()
+        self.deck.shuffle()
         hands = list(self.users.values())
         self.deck.deal(hands)
 
@@ -115,6 +125,7 @@ class CardGame:
         self.currentSuit = self.discardPile[-1].suit
         self.currentRank = self.discardPile[-1].rank
         self.currentPlayer = random.choice(list(self.users.keys()))
+
 
 
     def getPlayersHand(self, name):
@@ -267,6 +278,11 @@ class CardGame:
             if len(hand.cards) == 0:
                 print()
                 print(player, "out of cards...", player, "wins!")
+
+                #for display
+                winner = player
+                self.updateScore(winner)
+                self.displayPopUp(winner)
                 return True
         if self.deck.is_empty():
             print()
@@ -276,14 +292,30 @@ class CardGame:
             if playerCardCount < computerCardCount:
                 print()
                 print("You have less cards than the computer....You win!")
+
+                #for display
+                winner = list(self.users.keys())[0]
+                self.updateScore(winner)
+                self.displayPopUp(winner)
                 return True
             elif computerCardCount < playerCardCount:
                 print()
                 print("The computer has less cards...Computer wins!")
+
+                #for display
+                winner = "Computer"
+                self.updateScore(winner)
+                self.displayPopUp(winner)
                 return True
             else:
                 print()
                 print("Both players have the same number of cards...It's a tie!")
+
+                #for display
+                winner = "Its a tie!"
+                self.updateScore("Computer")
+                self.updateScore(list(self.users.keys())[0])
+                self.displayPopUp(winner)
                 return True
         return False
 
@@ -294,8 +326,56 @@ class CardGame:
         else:
             self.currentPlayer = list(self.users.keys())[0]
 
+    #FUNCTIONS ADDED FOR MY CREATIVE ELEMENT
+    def updateScore(self, winner):
+        """This function updates which player won"""
+        if winner != "Computer":
+            self.playerScore +=1
+        elif winner == "Computer":
+            self.computerScore +=1
+    
+    def displayScore(self):
+        return(str(list(self.users.keys())[0]) + ": " + str(self.playerScore) + " | Computer: " + str(self.computerScore))
+    
+    def displayPopUp(self, winner):
+        window = tk.Tk()
+        window.title("Game Over")
+        window.configure(bg="#f0f0f0")
+        window.geometry("300x200")
 
+        winnerText = str(winner) + " wins!"
+        scoreboardText = self.displayScore()
+        winnerLabel = tk.Label(window, text=winnerText, font=('Helvetica', 24), fg="#2e8b57", bg="#f0f0f0")
+        scoreboardLabel = tk.Label(window, text=scoreboardText, font=('Helvetica', 16), fg="black", bg="#f0f0f0")
+        winnerLabel.pack(padx=20, pady=10)
+        scoreboardLabel.pack(padx=20, pady=10)
 
+        def playAgain():
+             window.destroy()
+             self.resetGame()
+        
+        def quitGame(): 
+            window.destroy()
+            exit()
+        
+        buttonStyle = {"font": ("Helvetica", 12), "width": 12, "padx": 5, "pady": 5}
+        playAgainButton = tk.Button(window, text="Play Again", command=playAgain, **buttonStyle, fg="green")
+        quitButton = tk.Button(window, text="Quit", command=quitGame, **buttonStyle, fg="red")
+        playAgainButton.pack(padx=20, pady=5)
+        quitButton.pack(padx=20, pady=5)
+
+        window.mainloop()
+
+    def resetGame(self):
+        print("Starting a new game...")
+        print()
+        self.setupGame()
+        while not self.checkWinner():
+            if self.currentPlayer != "Computer":
+                self.playersTurn()
+            else:
+                self.computerTurn()
+            self.nextTurn()
 
 
 def main():
