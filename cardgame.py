@@ -30,13 +30,12 @@ INSTRUCTIONS:
     - If the deck is empty and there is not yet a winner, the person who currently has less cards in their hand wins!
         - If both players have the same amount of cards in their hand, the game ends in a tie
 """
+
 from __future__ import annotations #needed so classes could depend on eachother regardless of order
 import random
 from typing import List 
 
-#for graphics
-import tkinter as tk
-from tkinter import messagebox
+import tkinter as tk #for my creative display
 
 
 
@@ -69,15 +68,24 @@ class Deck:
                 self.cards.append(Card(i, j))
 
     def shuffle(self): 
+        """This function shuffles the cards in a deck"""
         random.shuffle(self.cards)
 
     def removeCard(self):
+        """This function removes a card from the deck"""
         return self.cards.pop()
     
     def is_empty(self):
+        """This function returns True when the deck is empty"""
         return len(self.cards) == 0
 
     def deal(self, hands: List["Hand"], n_cards = 14): 
+        """
+        This function deals cards to each player
+            - hands is a list of the Hand objects
+            - n_cards represents the total number of cards needed for the game
+                - since each player gets 7 cards & there are 2 players, n_cards = 14
+        """
         n_players = len(hands)
         for i in range(n_cards):
             if self.is_empty():
@@ -92,9 +100,11 @@ class Hand(Deck):
         self.cards = []
 
     def add_card(self, card):
+        """This function adds a card to a Hand"""
         self.cards.append(card)
 
     def remove_card(self, card):
+        """This function removes a card from a Hand"""
         self.cards.remove(card) 
     
     def hasPlayableCard(self, current_card):
@@ -104,6 +114,8 @@ class Hand(Deck):
                 return True
         return False
 
+#CardGame class
+    #A majority of my game-specific code is written in this class
 class CardGame: 
     def __init__(self, name):
         self.users = {
@@ -113,9 +125,11 @@ class CardGame:
         #For Creative Element --> scoreboard graphic 
         self.playerScore = 0
         self.computerScore = 0
+
         self.setupGame()
 
     def setupGame(self):
+        """This function sets up for a new game to be played"""
         self.deck = Deck()
         self.deck.shuffle()
         hands = list(self.users.values())
@@ -127,7 +141,6 @@ class CardGame:
         self.currentPlayer = random.choice(list(self.users.keys()))
 
 
-
     def getPlayersHand(self, name):
         return self.users[name]
             
@@ -135,6 +148,7 @@ class CardGame:
         return self.users["Computer"]
 
     def playersTurn(self):
+        """This function contains the logic needed for the player to complete their turn"""
         #Checks to see if the user is the current player
         if self.currentPlayer != "Computer":
             print()
@@ -197,16 +211,16 @@ class CardGame:
                         print(suit)
                         count += 1
 
-                    newSuit = int(input("Please select a suit: "))
                     while True:
+                        newSuit = (input("Please select a suit: "))
                         try:
-                            newSuit = int(input("Please select a suit: "))
+                            newSuit = int(newSuit)
                             if newSuit not in range(4):
-                                print("Invalid suit. Please select a choice from those listed above.")
+                                print("Invalid suit. Please select a choice from those listed above: ")
                             else:
                                 break 
                         except ValueError:
-                            print("Invalid input. Please enter a number.")
+                            print("Invalid input. Please enter a number: ")
                     
                     self.currentSuit = newSuit
                     print("Youse chose: ", suits[newSuit])
@@ -225,7 +239,8 @@ class CardGame:
 
     
     def computerTurn(self):
-        #Checks to see if the user is the current player
+        """This function contains the logic needed for the computer to complete their turn"""
+        #Checks to see if the computer is the current player
         if self.currentPlayer == "Computer":
             print()
             print("Computer's turn...")
@@ -262,10 +277,10 @@ class CardGame:
                     for card in self.getComputersHand().cards:
                         suitCounts[card.suit] += 1
 
-                    # Automatically picks the suit with the highest count
+                    # Automatically picks the suit that they have the most of
                     BiggestCountIndex = suitCounts.index(max(suitCounts))
                     suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
-                    self.currentSuit = BiggestCountIndex  # store suit as int
+                    self.currentSuit = BiggestCountIndex 
 
                     print("Computer chose: ", suits[BiggestCountIndex])
                     self.discardPile.append(Card(self.currentSuit, 8))
@@ -282,16 +297,21 @@ class CardGame:
 
     def checkWinner(self):
         """This function checks if the game has a winner"""
+
+        #Checks if players won by getting rid of all their cards
         for player, hand in self.users.items():
             if len(hand.cards) == 0:
                 print()
                 print(player, "out of cards...", player, "wins!")
 
-                #for display
+                #for creative display
                 winner = player
                 self.updateScore(winner)
                 self.displayPopUp(winner)
                 return True
+        
+        #Determines a winner in the case where the deck is empty so no more cards can be drawn
+            #whichever player has less cards in their hand will be the winner
         if self.deck.is_empty():
             print()
             print("Deck is now empty...counting remaining cards to determine the winner")
@@ -301,7 +321,7 @@ class CardGame:
                 print()
                 print("You have less cards than the computer....You win!")
 
-                #for display
+                #for creative display
                 winner = list(self.users.keys())[0]
                 self.updateScore(winner)
                 self.displayPopUp(winner)
@@ -310,16 +330,17 @@ class CardGame:
                 print()
                 print("The computer has less cards...Computer wins!")
 
-                #for display
+                #for creative display
                 winner = "Computer"
                 self.updateScore(winner)
                 self.displayPopUp(winner)
                 return True
             else:
+                #when both players have the same # of cards it is a tie
                 print()
                 print("Both players have the same number of cards...It's a tie!")
 
-                #for display
+                #for creative display
                 winner = "Its a tie!"
                 self.updateScore("Computer")
                 self.updateScore(list(self.users.keys())[0])
@@ -328,13 +349,13 @@ class CardGame:
         return False
 
     def nextTurn(self):
-        """Switch to the next player"""
+        """This function switches the turn to the next player"""
         if self.currentPlayer != "Computer":
             self.currentPlayer = "Computer"
         else:
             self.currentPlayer = list(self.users.keys())[0]
 
-    #FUNCTIONS ADDED FOR MY CREATIVE ELEMENT
+    #---------------FUNCTIONS ADDED FOR MY CREATIVE ELEMENT----------------
     def updateScore(self, winner):
         """This function updates which player won"""
         if winner != "Computer":
@@ -343,9 +364,11 @@ class CardGame:
             self.computerScore +=1
     
     def displayScore(self):
+        """This function displays the score for both players as a string"""
         return(str(list(self.users.keys())[0]) + ": " + str(self.playerScore) + " | Computer: " + str(self.computerScore))
     
     def displayPopUp(self, winner):
+        """This function designs + displays the pop up window that will show up at the end of a game"""
         window = tk.Tk()
         window.title("Game Over")
         window.configure(bg="#f0f0f0")
@@ -359,10 +382,12 @@ class CardGame:
         scoreboardLabel.pack(padx=20, pady=10)
 
         def playAgain():
-             window.destroy()
-             self.resetGame()
+            """This function will restart to a fresh game when the playAgain button is pressed"""
+            window.destroy()
+            self.resetGame()
         
         def quitGame(): 
+            """This function will quit the program when the quit button is pressed"""
             window.destroy()
             exit()
         
@@ -373,8 +398,10 @@ class CardGame:
         quitButton.pack(padx=20, pady=5)
 
         window.mainloop()
+        #----------END OF FUNCTIONS FOR MY CREATIVE ELEMENT-----------------
 
     def resetGame(self):
+        """This function will set up a new game to be played"""
         print("Starting a new game...")
         print()
         self.setupGame()
