@@ -198,8 +198,16 @@ class CardGame:
                         count += 1
 
                     newSuit = int(input("Please select a suit: "))
-                    while newSuit not in range(4):
-                        newSuit = int(input("Invalid suit. Please select a choice from those listed above: "))
+                    while True:
+                        try:
+                            newSuit = int(input("Please select a suit: "))
+                            if newSuit not in range(4):
+                                print("Invalid suit. Please select a choice from those listed above.")
+                            else:
+                                break 
+                        except ValueError:
+                            print("Invalid input. Please enter a number.")
+                    
                     self.currentSuit = newSuit
                     print("Youse chose: ", suits[newSuit])
                     self.discardPile.append(Card(self.currentSuit, 8))
