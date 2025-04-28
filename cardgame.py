@@ -32,14 +32,20 @@ INSTRUCTIONS:
 """
 
 from __future__ import annotations #needed so classes could depend on eachother regardless of order
-import random
-from typing import List 
-
-import tkinter as tk #for my creative display
-
+import random #used for shuffling
+from typing import List #I used this so that my IDE would recognize the type of objects prior to running (not necessary)
+import tkinter as tk #for my creative display windows
 
 
 #Card Class
+'''
+The Card class sets up a card object. Each card has a suit and a rank, based on the standard deck of 52 cards. 
+This class has a constructor to initialize each card with a suit and a rank. 
+It also has a method to print out the value of a card. 
+There are two more methods in this class which check 
+    1. if one card has the same suit as another
+    2. if one card has the same rank as another
+'''
 class Card:
     suit_list = ["Clubs", "Diamonds", "Hearts", "Spades"]
     rank_list = ["None", "Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"]
@@ -60,6 +66,16 @@ class Card:
         return (self.suit == other.suit)
 
 #Deck Class
+'''
+The Deck class sets up an object that emulates a deck of cards. 
+The constructor appends a standard deck of 52 cards into a list so that the deck can be accessed. 
+This class has a few methods to achieve the following: 
+                1. shuffle the deck
+                2. remove a card from the deck
+                3. check if the deck is empty
+                4. deal cards to players from the deck
+
+'''
 class Deck: 
     def __init__(self):
         self.cards = []
@@ -95,6 +111,15 @@ class Deck:
             hands[current_player].add_card(card)
     
 #Hand Class
+'''
+The Hand class sets up a Hand object that resembles the cards in a player's hand.
+The hand class has a constructor that initializes an list that will store the cards in the players hand.
+This class has a few methods that achieve the following: 
+                                1. add a card to the hand
+                                2. remove a card from the hand
+                                3. checks if the player has any cards that they can play for their turn 
+
+'''
 class Hand(Deck):
     def __init__(self):
         self.cards = []
@@ -116,6 +141,24 @@ class Hand(Deck):
 
 #CardGame class
     #A majority of my game-specific code is written in this class
+    '''
+    This class sets up a CardGame object. This stores most of my game-specific logic and this is called in order for the game to be played. 
+    This class has a constructor that sets up the game, initializes hands for each player, and sets the initial scoring to 0 for each player.
+
+    This class has methods to achieve the following: 
+                        1. Set up a new game
+                        2. get the cards in the players hand
+                        3. get the cards in the computers hand
+                        4. defines the logic needed for the player to complete their turn
+                        5. defines the logic needed for the computer to complete their turn
+                        6. Check who won the game 
+                        7. Switch turns
+                        8. Update the game score
+                        9. Display the score 
+                        10. Display a pop up window to show the game score and prompt the user if they want to play again or quit
+                        11. Reset the game 
+    
+    '''
 class CardGame: 
     def __init__(self, name):
         self.users = {
@@ -400,6 +443,8 @@ class CardGame:
         window.mainloop()
         #----------END OF FUNCTIONS FOR MY CREATIVE ELEMENT-----------------
 
+
+
     def resetGame(self):
         """This function will set up a new game to be played"""
         print("Starting a new game...")
@@ -413,6 +458,7 @@ class CardGame:
             self.nextTurn()
 
 
+#Main method: this code is used to call everything I wrote in my classes
 def main():
     print("Welcome to CRAZY 8!")
     print()
@@ -421,14 +467,16 @@ def main():
     print("Shuffling...")
     print("Dealing...")
 
+    #initializes a CardGame object called game
     game = CardGame(name)
+    
+    #find whose turn it is and keep switching turns until there is a winner
     while not game.checkWinner():
         if game.currentPlayer != "Computer":
             game.playersTurn()
         else:
             game.computerTurn()
 
-        #if not game.checkWinner():
         game.nextTurn()
 
 
