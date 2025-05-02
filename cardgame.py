@@ -540,7 +540,7 @@ def main():
 
         game.nextTurn()
 
-
+#calls main method
 if __name__ == "__main__":
     main()
 
