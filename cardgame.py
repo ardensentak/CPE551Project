@@ -170,12 +170,12 @@ class Hand(Deck):
     '''
 class CardGame: 
     def __init__(self, name):
-        #dictionary that contains player's name and their Hand
+        #dictionary that contains player's names and their Hand
         self.users = {
             name :  Hand(),
             "Computer" : Hand()
         }
-        #For Creative Element --> scoreboard graphic (store the win count for each player)
+        #For Creative Element --> scoreboard graphic (store the win count for each player; initial win count set to 0)
         self.playerScore = 0
         self.computerScore = 0
 
