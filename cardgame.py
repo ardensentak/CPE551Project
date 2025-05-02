@@ -505,7 +505,10 @@ class CardGame:
 
 
     def resetGame(self):
-        """This function will set up a new game to be played"""
+        """
+        This function will set up a new game to be played
+        After the first game finishes (called by main), this function allows the other games 2nd, 3rd, 4th etc.. to be played
+        """
         print("Starting a new game...")
         print()
         self.setupGame() #this function is called so a fresh game is set up
